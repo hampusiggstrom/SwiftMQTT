@@ -145,7 +145,9 @@ open class MQTTSession: MQTTSessionStreamDelegate {
             callSuccessCompletionBlock(for: pubAck.messageID)
         case .publish:
             let publishPacket = MQTTPublishPacket(header: header, networkData: networkData)
-            sendPubAck(for: publishPacket.messageID)
+            if publishPacket.message.QoS != .atMostOnce {
+                sendPubAck(for: publishPacket.messageID)
+            }
             let payload = publishPacket.message.payload
             let topic = publishPacket.message.topic
             delegate?.mqttDidReceive(message: payload, in: topic, from: self)
